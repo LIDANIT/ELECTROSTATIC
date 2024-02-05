@@ -1,5 +1,3 @@
-import os
-
 import matplotlib.figure
 from PyQt6.QtWidgets import (QApplication, QWidget, QMainWindow, QPushButton, QTabWidget,
                              QGridLayout, QComboBox, QLineEdit, QLabel, QMessageBox, QFileDialog)
@@ -9,16 +7,18 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from field import *
 import sys
 
-
 text = ('Вводимые параметры:'
         '\n"Xнач." - начальная координата графика по оси абсцисс в метрах. (Примеры: 0; -1.5; 3.0.)'
         '\n"Yкон." - начальная координата графика по оси ординат в метрах. (Примеры: 0; -1.5; 3.0.)'
         '\n"Xнач." - конечная координата графика по оси абсцисс в метрах. (Примеры: 0; -1.5; 3.0.)'
         '\n"Yкон." - конечная координата графика по оси ординат в метрах. (Примеры: 0; -1.5; 3.0.)'
-        '\n"Частота линий" - отвечает за частоту отрисовки эквипотенциальных и силовых линий, должно быть неотрицательным числом. (Примеры: 0.5; 5.))'
+        '\n"Частота линий" - отвечает за частоту отрисовки эквипотенциальных и силовых линий, должно быть'
+        ' неотрицательным числом. (Примеры: 0.5; 5.))'
         '\n"Заряд" - заряд в кулонах, который Вы хотите дать телу. (Примеры: -5; 0; 0.5.)'
-        '\n"Имя полотна" - название создаваемого полотна для рисования нового графика. (Примеры: График №1; Новый график.)'
-        '\n"0" (Рядом с кнопкой "Удалить заряд") - заряд выбранного объекта. Ввести число для измерения заряда. (Примеры: 0; -5; 3.5.)'
+        '\n"Имя полотна" - название создаваемого полотна для рисования нового графика.'
+        ' (Примеры: График №1; Новый график.)'
+        '\n"0" (Рядом с кнопкой "Удалить заряд") - заряд выбранного объекта. Ввести число для измерения заряда.'
+        ' (Примеры: 0; -5; 3.5.)'
         '\n'
         '\nПереключатели:'
         '\n"Эквипотенциалы" - вкл./выкл. отрисовку эквипотенциальных линий. (Вкл. - голубой, выключено - белый.)'
@@ -38,11 +38,11 @@ text = ('Вводимые параметры:'
 
 #  Вспомогательные функции.
 def validation_float(n: str):
-    '''
+    """
 
     :param n: проверяемая строка
     :return: True, если можно преобразовать в float
-    '''
+    """
     if n == '':
         return True
     try:
@@ -56,21 +56,21 @@ def validation_float(n: str):
 def create_window():
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.setWindowIcon(QIcon(os.getcwd()+'\\Electrostatic.png'))
+    window.setWindowIcon(QIcon('Electrostatic.png'))
     window.show()
     sys.exit(app.exec())
 
 
 #  Функция создания заряда
 def new_charge(tabs: QTabWidget, button: QPushButton, other_button: QPushButton, _type: str):
-    '''
+    """
 
     :param tabs: вкладка виджетов
     :param button: проверяемая кнопка
     :param other_button: выключаемая кнопка
     :param _type: 'point', если необходимо поставить точку
     :return: создание заряда типа _type
-    '''
+    """
     if tabs.count():
         graph = tabs.currentWidget()
         graph.value = button.isChecked()
@@ -80,12 +80,12 @@ def new_charge(tabs: QTabWidget, button: QPushButton, other_button: QPushButton,
 
 #  Функция отрисовки графика
 def _create_graph(settings: QWidget, tabs: QTabWidget):
-    '''
+    """
 
     :param settings: вкладка с настройками
     :param tabs: вкладка графиков
     :return: отрисовка графика
-    '''
+    """
     if tabs.count():
         plt.delaxes(plt.subplot())
         plt.close()
@@ -130,7 +130,8 @@ def _create_graph(settings: QWidget, tabs: QTabWidget):
             graph.freq = float(freq.text() or str(graph.freq))
             if graph.x_min < graph.x_max:
                 if graph.y_min < graph.y_max:
-                    fig = create_graf(graph.charges, graph.x_min, graph.y_min, graph.x_max, graph.y_max, graph.acc_power, graph.acc_charges, graph.freq, circle, arrows)
+                    fig = create_graf(graph.charges, graph.x_min, graph.y_min, graph.x_max, graph.y_max,
+                                      graph.acc_power, graph.acc_charges, graph.freq, circle, arrows)
                     graph.canvas_update(fig)
                 else:
                     y_min.setStyleSheet('border: 2px solid red; margin: 1px')
@@ -142,27 +143,29 @@ def _create_graph(settings: QWidget, tabs: QTabWidget):
 
 #  Функция удаления графика
 def _del_graph(tabs: QTabWidget):
-    '''
+    """
 
     :param tabs: вкладка графиков
     :return: стирает текущий график
-    '''
+    """
     if tabs.count():
         graph = tabs.currentWidget()
         graph.charges = []
         tabs.parent().findChild(Container, 'settings').findChild(ComboBox).clear()
         plt.delaxes(plt.subplot())
         plt.close()
-        graph.canvas_update(create_graf(graph.charges, graph.x_min, graph.y_min, graph.x_max, graph.y_max, graph.acc_power, graph.acc_charges, graph.freq))
+        graph.canvas_update(
+            create_graf(graph.charges, graph.x_min, graph.y_min, graph.x_max, graph.y_max, graph.acc_power,
+                        graph.acc_charges, graph.freq))
 
 
 #  Функция переключения вкладки
 def other_tab(main_container: QWidget):
-    '''
+    """
 
     :param main_container: главный виджет
     :return: обрабатывает переключение на другую вкладку
-    '''
+    """
     settings = main_container.findChild(Container, 'settings')
     graph = main_container.findChild(QTabWidget).currentWidget()
     settings.findChild(Button, 'new_point_charge').setChecked(False)
@@ -171,24 +174,24 @@ def other_tab(main_container: QWidget):
 
 
 #  Функция создания нового полотна для графика
-def _new_graph_plot(tabs: QTabWidget, name: str ='График'):
-    '''
+def _new_graph_plot(tabs: QTabWidget, name: str = 'График'):
+    """
 
     :param tabs: вкладка графиков
     :param name: имя полотна
     :return: создаёт новое полотно
-    '''
+    """
     graph = Graph(None)
     tabs.addTab(graph, name)
 
 
 #  Функция удаления текущего полотна для графика
 def _del_graph_plot(tabs: QTabWidget):
-    '''
+    """
 
     :param tabs: вкладка графиков
     :return: удаляет текущее полотно
-    '''
+    """
     _del_graph(tabs)
     if tabs.count() > 1:
         tabs.removeTab(tabs.currentIndex())
@@ -199,10 +202,10 @@ def _del_graph_plot(tabs: QTabWidget):
 
 #  Функция открытия окна помощи
 def open_help():
-    '''
+    """
 
     :return: открытие окна помощи
-    '''
+    """
     window = QMessageBox()
     window.setText(text)
     window.setWindowTitle('Помощь')
@@ -213,77 +216,77 @@ def open_help():
 
 class Font(QFont):
     def __init__(self, size: int = 20):
-        '''
+        """
 
         :param size: размер шрифта
-        '''
+        """
         super(Font, self).__init__()
         self.setPointSize(size)
 
 
 class Container(QWidget):
     def __init__(self, parent: QWidget, name: str = None):
-        '''
+        """
 
         :param parent: виджет-родитель
         :param name: имя виджета
-        '''
+        """
         super(Container, self).__init__()
         self.setObjectName(name)
         self.setParent(parent)
 
 
 class Label(QLabel):
-    def __init__(self, text: str, name: str = None, font: QFont = Font()):
-        '''
+    def __init__(self, text_of_label: str, name: str = None, font: QFont = Font()):
+        """
 
-        :param text: текст
+        :param text_of_label: текст
         :param name: имя виджета
         :param font: шрифт
-        '''
-        super(Label, self).__init__(text)
+        """
+        super(Label, self).__init__(text_of_label)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(name)
         self.setFont(font)
         self.font_metrics = QFontMetrics(font)
-        self.setFixedHeight(self.font_metrics.height()*3)
+        self.setFixedHeight(self.font_metrics.height() * 3)
         self.setAlignment(Qt.AlignmentFlag.AlignTop)
 
 
 class Button(QPushButton):
-    def __init__(self, text: str, _type: int = 0, name: str = None):
-        '''
+    def __init__(self, text_of_button: str, _type: bool = False, name: str = None):
+        """
 
-        :param text: текст кнопки
+        :param text_of_button: текст кнопки
         :param _type: тип кнопки(1 - рычаг, 0 - кнопка)
         :param name: имя виджета кнопки
-        '''
-        super(Button, self).__init__(text)
+        """
+        super(Button, self).__init__(text_of_button)
         self.setObjectName(name)
         self.setFont(Font())
         self.setCheckable(_type)
 
 
 class LineEdit(QLineEdit):
-    def __init__(self, text: str, name: str = None):
-        '''
+    def __init__(self, text_of_label: str, name: str = None):
+        """
 
-        :param text: текст заднего фона
+        :param text_of_label: текст заднего фона
         :param name: имя виджета строки ввода
-        '''
+        """
         super(LineEdit, self).__init__()
-        self.setPlaceholderText(text)
+        self.setPlaceholderText(text_of_label)
         self.setObjectName(name)
         self.setFont(Font())
 
 
 class ComboBox(QComboBox):
     def __init__(self, parent: QWidget, font: QFont):
-        '''
+        """
 
         :param parent: виджет-родитель
         :param font: шрифт
-        '''
+        """
         super(ComboBox, self).__init__(parent)
         self.setFont(font)
         self.charges = []
@@ -291,11 +294,11 @@ class ComboBox(QComboBox):
         self.lastIndex = None
 
     def update_charges(self, charges: list):
-        '''
+        """
 
         :param charges: список зарядов
         :return: обновляет комбо-бокс
-        '''
+        """
         self.charges = charges
         self.clear()
         for i in self.charges:
@@ -306,8 +309,8 @@ class ComboBox(QComboBox):
 
     def show_charge(self):
         if self.count():
-            text = self.currentText()[16:-3]
-            self.parent().findChild(LineEdit, 're_charge').setText(text)
+            text_of_combo = self.currentText()[16:-3]
+            self.parent().findChild(LineEdit, 're_charge').setText(text_of_combo)
             self.light()
             self.lastIndex = self.currentIndex()
 
@@ -318,38 +321,39 @@ class ComboBox(QComboBox):
         graph.charge_light_on(self.currentIndex())
 
     def recharge(self, entry: QLineEdit):
-        '''
+        """
 
         :param entry: строка ввода
         :return: отображает текущий заряд в панели обновления его значения
-        '''
+        """
         graph = self.parent().parent().findChild(QTabWidget).currentWidget()
         if validation_float(entry.text()):
             entry.setStyleSheet('border: none; margin: 2px')
             if self.count():
-                text = entry.text() or '0'
-                if text == '-':
-                    text = '0'
-                self.setItemText(self.currentIndex(), self.currentText()[:16] + str(float(text)) + 'Кл.')
-                graph.recharge(text, self.currentIndex())
+                text_of_entry = entry.text() or '0'
+                if text_of_entry == '-':
+                    text_of_entry = '0'
+                self.setItemText(self.currentIndex(), self.currentText()[:16] + str(float(text_of_entry)) + 'Кл.')
+                graph.recharge(text_of_entry, self.currentIndex())
         else:
             entry.setStyleSheet('border: 2px solid red; margin: 1px')
 
     def delete_charge(self):
         if self.count():
             graph = self.parent().parent().findChild(QTabWidget).currentWidget()
-            graph.delete_charge(self.currentIndex())
             self.removeItem(self.currentIndex())
+            graph.delete_charge(self.currentIndex())
 
 
 class Graph(Container):
     def __init__(self, parent: QWidget = None, name: str = None):
-        '''
+        """
 
         :param parent: виджет-родитель
         :param name: имя виджета
-        '''
+        """
         super().__init__(parent)
+        self.save_btn = None
         self.setObjectName(name)
         self.layout_graph = QGridLayout(self)
 
@@ -360,7 +364,7 @@ class Graph(Container):
         self.y_min = 0
         self.x_max = 10
         self.y_max = 10
-        self.freq = 0.6
+        self.freq = 2
         self.acc_power = 100
         self.acc_charges = 100
 
@@ -372,30 +376,32 @@ class Graph(Container):
         self._type = 'point'
         self.file = QFileDialog()
 
-        fig = create_graf(self.charges, self.x_min, self.y_min, self.x_max, self.y_max, self.acc_power, self.acc_charges, self.freq)
+        fig = create_graf(self.charges, self.x_min, self.y_min, self.x_max, self.y_max, self.acc_power,
+                          self.acc_charges, self.freq)
         self.canvas_update(fig)
         self.setLayout(self.layout_graph)
 
     def get_cords(self, event):
-        '''
+        """
         :return: получает координаты курсора с графика
-        '''
+        """
         mx, my = event.x, event.y
         x, y = self.canvas.figure.get_axes()[0].transData.inverted().transform([mx, my])
         if self.value and \
-            (self.canvas.figure.get_axes()[0].get_xlim()[1] > x > self.canvas.figure.get_axes()[0].get_xlim()[0]) and \
+                (self.canvas.figure.get_axes()[0].get_xlim()[1] > x > self.canvas.figure.get_axes()[0].get_xlim()[
+                    0]) and \
                 (self.canvas.figure.get_axes()[0].get_ylim()[1] > y > self.canvas.figure.get_axes()[0].get_ylim()[0]):
             self.add_to_stack(x, y)
         else:
             self.add_to_stack(None, None)
 
     def add_to_stack(self, x: int, y: int):
-        '''
+        """
 
         :param x: координата x
         :param y: координата y
         :return: добавляет выбранные координаты в очередь
-        '''
+        """
         if self.x0 is None:
             self.x0 = x
             self.y0 = y
@@ -414,27 +420,34 @@ class Graph(Container):
                 self.y1 = None
 
     def add_charge(self, x0, y0, x1, y1):
-        '''
+        """
         :return: добавляет заряд в отрисовку и к графику
-        '''
+        """
         if not ((x0 is None) or (y0 is None)):
-            if validation_float(self.parent().parent().parent().findChild(Container, 'settings').findChild(LineEdit, 'charge_value').text()):
-                self.parent().parent().parent().findChild(Container, 'settings').findChild(LineEdit, 'charge_value').setStyleSheet('border: none; margin: 2px')
-                self.q = float(self.parent().parent().parent().findChild(Container, 'settings').findChild(LineEdit, 'charge_value').text() or '0')
+            if validation_float(self.parent().parent().parent().findChild(Container, 'settings').findChild(
+                    LineEdit, 'charge_value').text()):
+                self.parent().parent().parent().findChild(Container, 'settings').findChild(
+                    LineEdit, 'charge_value').setStyleSheet(
+                    'border: none; margin: 2px')
+                self.q = float(self.parent().parent().parent().findChild(Container, 'settings').findChild(
+                    LineEdit, 'charge_value').text() or '0')
                 self.canvas_update(plot_variable_charge(self.canvas.figure, x0, y0, x1, y1, self.q))
                 self.charges.append([self.q, x0, y0, x1, y1])
                 for i in self.charges:
                     if not len(i):
                         del i
-                self.parent().parent().parent().findChild(Container, 'settings').findChild(ComboBox).update_charges(self.charges)
+                self.parent().parent().parent().findChild(Container, 'settings').findChild(ComboBox).update_charges(
+                    self.charges)
             else:
-                self.parent().parent().parent().findChild(Container, 'settings').findChild(LineEdit, 'charge_value').setStyleSheet('border: 2px solid red; margin: 1px')
+                self.parent().parent().parent().findChild(Container, 'settings').findChild(
+                    LineEdit, 'charge_value').setStyleSheet(
+                    'border: 2px solid red; margin: 1px')
 
     def canvas_update(self, fig: matplotlib.figure.Figure):
-        '''
+        """
         :param fig: фигура
         :return: обновление канваса
-        '''
+        """
         for i in self.findChildren(Canvas) + self.findChildren(Button):
             i.deleteLater()
         self.canvas = Canvas(fig)
@@ -447,55 +460,57 @@ class Graph(Container):
 
     def open_file(self):
         self.file.setLabelText(self.file.DialogLabel.Accept, '123')
-        text = self.file.getSaveFileName(caption='Сохранить график')[0]
-        self.canvas.figure.savefig(text) if text else 0
+        text_btn = self.file.getSaveFileName(caption='Сохранить график')[0]
+        self.canvas.figure.savefig(text_btn) if text_btn else 0
 
-    def recharge(self, text: str, index: int):
-        '''
+    def recharge(self, text_of_charge: str, index: int):
+        """
 
-        :param text: значение заряда
+        :param text_of_charge: значение заряда
         :param index: индекс заряда
         :return: изменяет значение заряда
-        '''
-        self.charges[index][0] = float(text)
+        """
+        self.charges[index][0] = float(text_of_charge)
         self.canvas_update(plot_variable_charge(self.canvas.figure, self.charges[index][1], self.charges[index][2],
                                                 self.charges[index][3], self.charges[index][4], self.charges[index][0]))
 
     def delete_charge(self, i: int):
-        '''
+        """
 
         :param i: индекс заряда
         :return: удаляет выбранный заряд
-        '''
+        """
         self.canvas_update(plot_variable_charge(self.canvas.figure, self.charges[i][1], self.charges[i][2],
-                                                self.charges[i][3], self.charges[i][4], self.charges[i][0], eraser=1))
+                                                self.charges[i][3], self.charges[i][4], self.charges[i][0],
+                                                eraser=True))
         del self.charges[i]
 
     def charge_light_on(self, i: int):
-        '''
+        """
 
         :param i: индекс заряда
         :return: подсвечивает выбранный заряд
-        '''
+        """
         self.canvas_update(plot_variable_charge(self.canvas.figure, self.charges[i][1], self.charges[i][2],
-                                                self.charges[i][3], self.charges[i][4], self.charges[i][0], light=1))
+                                                self.charges[i][3], self.charges[i][4], self.charges[i][0],
+                                                light=True))
 
     def charge_light_off(self, i: int):
-        '''
+        """
 
         :param i: индекс заряда
         :return: убирает подсветку заряда
-        '''
+        """
         self.canvas_update(plot_variable_charge(self.canvas.figure, self.charges[i][1], self.charges[i][2],
                                                 self.charges[i][3], self.charges[i][4], self.charges[i][0]))
 
 
 class Canvas(FigureCanvasQTAgg):
     def __init__(self, fig: matplotlib.figure.Figure):
-        '''
+        """
 
         :param fig: фигура графика
-        '''
+        """
         super(Canvas, self).__init__(fig)
 
 
@@ -540,16 +555,16 @@ class MainWindow(QMainWindow):
         y1.setStyleSheet('border: none; margin: 2px')
         freq.setStyleSheet('border: none; margin: 2px')
 
-        circle_btn = Button('Эквипотенциалы', 1, name='circle')
+        circle_btn = Button('Эквипотенциалы', True, name='circle')
         circle_btn.setChecked(True)
-        arrows_btn = Button('Силовые линии', 1, name='arrows')
+        arrows_btn = Button('Силовые линии', True, name='arrows')
         arrows_btn.setChecked(True)
 
         charge_value = LineEdit('Заряд', 'charge_value')
         charge_value.setStyleSheet('border: none; margin: 2px')
-        new_point_charge = Button('Точка', _type=1, name='new_point_charge')
+        new_point_charge = Button('Точка', _type=True, name='new_point_charge')
         new_point_charge.clicked.connect(lambda: new_charge(graph_tabs, new_point_charge, new_line_charge, 'point'))
-        new_line_charge = Button('Прямая', _type=1, name='new_line_charge')
+        new_line_charge = Button('Прямая', _type=True, name='new_line_charge')
         new_line_charge.clicked.connect(lambda: new_charge(graph_tabs, new_line_charge, new_point_charge, 'line'))
         graph_tabs.currentChanged.connect(lambda: other_tab(main_container))
 
